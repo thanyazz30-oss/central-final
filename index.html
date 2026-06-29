@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ธัญพรคลินิก — ลงชื่อปฏิบัติงาน</title>
+<link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--g:#0d6e4f;--gl:#e6f4ef;--gm:#1a8a62;--w:#fff;--bg:#f0f4f2;--bd:#e0e8e4;--tx:#111;--mu:#6b7c74;--so:#adb8b3;--red:#dc2626;--org:#f97316;--r:12px;--rs:8px;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Sarabun',sans-serif;background:var(--bg);color:var(--tx);font-size:14px;min-height:100vh;}
+
+/* HEADER */
+.hdr{background:var(--g);height:62px;padding:0 24px;display:flex;align-items:center;gap:12px;}
+.hlogo{width:38px;height:38px;border-radius:50%;background:rgba(255,255,255,.15);display:flex;align-items:center;justify-content:center;font-size:18px;}
+.htxt h1{font-size:17px;font-weight:600;color:#fff;}
+.htxt p{font-size:11px;color:rgba(255,255,255,.6);margin-top:1px;}
+.hright{margin-left:auto;display:flex;align-items:center;gap:8px;}
+.sync{font-size:11px;padding:3px 10px;border-radius:20px;background:rgba(255,255,255,.12);color:rgba(255,255,255,.8);}
+.sync.ok{background:rgba(16,185,129,.3);color:#6ee7b7;}
+.sync.err{background:rgba(220,38,38,.3);color:#fca5a5;}
+
+.page{max-width:700px;margin:0 auto;padding:24px 16px;}
+
+/* DATE TYPE CARD */
+.top-card{background:var(--w);border-radius:var(--r);border:1px solid var(--bd);padding:18px 22px;margin-bottom:16px;}
+.top-row{display:flex;align-items:center;gap:12px;flex-wrap:wrap;}
+.clbl{font-size:12px;color:var(--mu);font-weight:500;}
+input[type=date]{border:1px solid var(--bd);border-radius:var(--rs);padding:7px 10px;font-size:13px;font-family:inherit;background:#fff;color:var(--tx);outline:none;}
+input[type=date]:focus{border-color:var(--g);}
+.dtype-wrap{display:flex;gap:8px;margin-left:auto;}
+.dtype-btn{padding:8px 18px;border-radius:20px;border:1px solid var(--bd);background:#fff;font-size:13px;font-family:inherit;cursor:pointer;color:var(--mu);font-weight:500;transition:all .15s;display:flex;flex-direction:column;align-items:center;gap:1px;}
+.dtype-btn small{font-size:10px;opacity:.65;}
+.dtype-btn.aw{background:var(--g);color:#fff;border-color:var(--g);}
+.dtype-btn.ah{background:var(--org);color:#fff;border-color:var(--org);}
+
+/* STAFF GRID */
+.section-title{font-size:13px;font-weight:600;color:var(--mu);letter-spacing:.4px;margin-bottom:12px;}
+.staff-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:20px;}
+.staff-card{background:var(--w);border-radius:var(--r);border:1.5px solid var(--bd);padding:14px 16px;cursor:pointer;transition:all .15s;display:flex;align-items:center;gap:12px;}
+.staff-card:hover{border-color:var(--g);background:#f8fdfb;}
+.staff-card.selected{border-color:var(--g);background:var(--gl);box-shadow:0 0 0 3px rgba(13,110,79,.12);}
+.staff-card.done{border-color:#10b981;background:#f0fdf9;}
+.staff-avatar{width:40px;height:40px;border-radius:50%;background:var(--gl);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;}
+.staff-card.done .staff-avatar{background:#d1fae5;}
+.staff-name{font-size:13px;font-weight:500;line-height:1.4;}
+.staff-status{font-size:11px;margin-top:2px;}
+.staff-status.in{color:#059669;font-weight:600;}
+.staff-status.out{color:var(--so);}
+
+/* PIN PANEL */
+.pin-panel{background:var(--w);border-radius:var(--r);border:1px solid var(--bd);padding:24px;margin-bottom:16px;display:none;}
+.pin-panel.open{display:block;}
+.pin-header{display:flex;align-items:center;gap:10px;margin-bottom:20px;}
+.pin-avatar{width:44px;height:44px;border-radius:50%;background:var(--gl);display:flex;align-items:center;justify-content:center;font-size:20px;}
+.pin-name{font-size:15px;font-weight:600;}
+.pin-sub{font-size:12px;color:var(--mu);margin-top:2px;}
+.pin-display{display:flex;gap:8px;justify-content:center;margin-bottom:20px;}
+.pin-dot{width:14px;height:14px;border-radius:50%;border:2px solid var(--bd);background:#fff;transition:all .2s;}
+.pin-dot.filled{background:var(--g);border-color:var(--g);}
+.pin-keypad{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;max-width:240px;margin:0 auto 16px;}
+.pin-key{height:54px;border-radius:10px;border:1px solid var(--bd);background:#fff;font-size:20px;font-weight:500;font-family:inherit;cursor:pointer;transition:all .15s;display:flex;align-items:center;justify-content:center;color:var(--tx);}
+.pin-key:hover{background:var(--gl);border-color:var(--g);}
+.pin-key:active{transform:scale(.94);}
+.pin-key.del{font-size:16px;color:var(--mu);}
+.pin-key.del:hover{background:#fef2f2;border-color:#fca5a5;color:var(--red);}
+.pin-err{color:var(--red);font-size:13px;text-align:center;margin-bottom:10px;display:none;}
+.pin-err.show{display:block;}
+.pin-note-row{display:flex;gap:8px;align-items:center;margin-bottom:14px;}
+.pin-note{flex:1;border:1px solid var(--bd);border-radius:var(--rs);padding:8px 12px;font-size:13px;font-family:inherit;outline:none;}
+.pin-note:focus{border-color:var(--g);}
+.pin-actions{display:flex;gap:8px;justify-content:center;}
+
+/* HISTORY */
+.hist-card{background:var(--w);border-radius:var(--r);border:1px solid var(--bd);padding:16px 20px;margin-bottom:16px;}
+.hist-wrap{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px;}
+.hbtn{padding:4px 12px;border-radius:20px;border:1px solid var(--bd);background:#fff;font-size:12px;font-family:inherit;cursor:pointer;color:var(--mu);transition:all .15s;}
+.hbtn:hover{border-color:var(--g);color:var(--g);}
+.hbtn.act{background:var(--g);color:#fff;border-color:var(--g);}
+.hbtn.hol{border-color:var(--org);color:#c2410c;}
+
+/* SUMMARY */
+.summary-card{background:var(--w);border-radius:var(--r);border:1px solid var(--bd);padding:16px 20px;margin-bottom:16px;}
+.sum-row{display:flex;align-items:center;justify-content:space-between;padding:6px 0;border-bottom:.5px solid #f3f4f6;}
+.sum-row:last-child{border:none;}
+.sum-name{font-size:13px;font-weight:500;}
+.sum-badge{padding:2px 10px;border-radius:12px;font-size:11px;font-weight:600;}
+.sum-in{background:var(--gl);color:var(--g);}
+.sum-out{background:#f1f5f9;color:var(--so);}
+.sum-time{font-size:11px;color:var(--mu);margin-top:1px;}
+
+/* ACTIONS */
+.act-bar{display:flex;gap:8px;flex-wrap:wrap;}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:9px 20px;border-radius:var(--rs);border:1px solid var(--bd);background:#fff;color:var(--tx);font-size:13px;font-family:inherit;cursor:pointer;font-weight:500;transition:all .15s;}
+.btn:hover{background:#f8f9fa;}
+.bp{background:var(--g);color:#fff;border-color:var(--g);}
+.bp:hover{background:var(--gm);}
+.bdl{background:#7c3aed;color:#fff;border-color:#7c3aed;}
+.bdl:hover{background:#6d28d9;}
+
+/* MODAL PDF */
+.mbg{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:200;display:none;align-items:center;justify-content:center;}
+.mbg.open{display:flex;}
+.modal{background:#fff;border-radius:14px;padding:28px 28px;width:380px;max-width:95vw;}
+.modal h3{font-size:16px;font-weight:600;margin-bottom:18px;}
+.mg{display:flex;flex-direction:column;gap:5px;margin-bottom:14px;}
+.mg label{font-size:12px;font-weight:600;color:var(--mu);}
+.mg input,.mg select{border:1px solid var(--bd);border-radius:var(--rs);padding:8px 10px;font-size:13px;font-family:inherit;outline:none;width:100%;}
+.mg input:focus,.mg select:focus{border-color:var(--g);}
+.ma{display:flex;gap:8px;margin-top:18px;justify-content:flex-end;}
+
+/* LOADING */
+.lov{position:fixed;inset:0;background:rgba(0,0,0,.3);z-index:300;display:none;align-items:center;justify-content:center;}
+.lov.on{display:flex;}
+.lbox{background:#fff;border-radius:12px;padding:24px 32px;text-align:center;font-size:14px;}
+.sp{width:28px;height:28px;border:3px solid var(--gl);border-top-color:var(--g);border-radius:50%;animation:spin .7s linear infinite;margin:0 auto 10px;}
+@keyframes spin{to{transform:rotate(360deg);}}
+
+.toast{position:fixed;bottom:24px;right:24px;background:#1a1a1a;color:#fff;padding:10px 18px;border-radius:8px;font-size:13px;opacity:0;transform:translateY(8px);transition:all .25s;pointer-events:none;z-index:9999;display:flex;align-items:center;gap:8px;}
+.toast.show{opacity:1;transform:translateY(0);}
+
+@media(max-width:500px){.staff-grid{grid-template-columns:1fr;}.dtype-wrap{margin-left:0;}}
+</style>
+</head>
+<body>
+
+<div class="hdr">
+  <div class="hlogo">🏥</div>
+  <div class="htxt"><h1>ธัญพรคลินิก</h1><p>ระบบลงชื่อปฏิบัติงาน</p></div>
+  <div class="hright">
+    <div class="sync" id="sync">☁️ พร้อม</div>
+  </div>
+</div>
+
+<div class="lov" id="lov"><div class="lbox"><div class="sp"></div>กำลังบันทึก...</div></div>
+
+<div class="page">
+
+  <!-- DATE + TYPE -->
+  <div class="top-card">
+    <div class="top-row">
+      <span class="clbl">วันที่</span>
+      <input type="date" id="inp-date" onchange="onDateChange()">
+      <div class="dtype-wrap">
+        <button class="dtype-btn aw" id="btn-work" onclick="setType('work')">วันปกติ<small>17:30–21:00</small></button>
+        <button class="dtype-btn" id="btn-hol" onclick="setType('holiday')">วันหยุด<small>08:00–20:00</small></button>
+      </div>
+    </div>
+  </div>
+
+  <!-- HISTORY -->
+  <div class="hist-card" id="hist-card" style="display:none;">
+    <div class="section-title">📅 วันที่บันทึกไว้แล้ว</div>
+    <div class="hist-wrap" id="hist-list"></div>
+  </div>
+
+  <!-- STAFF GRID -->
+  <div class="section-title">เลือกชื่อของคุณแล้วกรอก PIN เพื่อลงชื่อ</div>
+  <div class="staff-grid" id="staff-grid"></div>
+
+  <!-- PIN PANEL -->
+  <div class="pin-panel" id="pin-panel">
+    <div class="pin-header">
+      <div class="pin-avatar" id="pin-avatar">👤</div>
+      <div>
+        <div class="pin-name" id="pin-name">—</div>
+        <div class="pin-sub" id="pin-sub">กรอก PIN 4 หลักของคุณ</div>
+      </div>
+    </div>
+    <div class="pin-display" id="pin-display"></div>
+    <div class="pin-err" id="pin-err">❌ PIN ไม่ถูกต้อง กรุณาลองใหม่</div>
+    <div class="pin-keypad" id="pin-keypad"></div>
+    <div class="pin-note-row">
+      <input type="text" class="pin-note" id="pin-note" placeholder="หมายเหตุ (ถ้ามี)">
+    </div>
+    <div class="pin-actions">
+      <button class="btn" onclick="cancelPin()">ยกเลิก</button>
+    </div>
+  </div>
+
+  <!-- SUMMARY -->
+  <div class="summary-card" id="summary-card" style="display:none;">
+    <div class="section-title">📋 สรุปการเข้างานวันนี้</div>
+    <div id="summary-list"></div>
+  </div>
+
+  <!-- ACTIONS -->
+  <div class="act-bar">
+    <button class="btn bdl" onclick="openModal()">📄 ดาวน์โหลด PDF</button>
+  </div>
+</div>
+
+<!-- PDF MODAL -->
+<div class="mbg" id="mbg">
+  <div class="modal">
+    <h3>📄 เลือกช่วงเวลา PDF</h3>
+    <div class="mg"><label>ตั้งแต่วันที่</label><input type="date" id="pdf-from"></div>
+    <div class="mg"><label>ถึงวันที่</label><input type="date" id="pdf-to"></div>
+    <div class="mg"><label>เฉพาะบุคลากร (ถ้าต้องการ)</label>
+      <select id="pdf-th">
+        <option value="">— ทั้งหมด —</option>
+        <option>นางธัญพร ใยดี</option>
+        <option>น.ส. ยุภาพร สิงคร</option>
+        <option>นายณรงค์กรณ์ หล้าดวงดี</option>
+        <option>นางสาวปิยะธิดา สุรนารถ</option>
+        <option>นางจุณธิดา โคลงฉันท์</option>
+        <option>น.ส. นุชราภรณ์ สุโพนอก</option>
+        <option>นายนครินทร์ แก้วบุตรดี</option>
+      </select>
+    </div>
+    <div class="ma">
+      <button class="btn" onclick="closeMod()">ยกเลิก</button>
+      <button class="btn bdl" onclick="exportPDF(false)">PDF ตามที่เลือก</button>
+      <button class="btn bp" onclick="exportPDF(true)">PDF ทั้งหมด</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"><span id="tic">✓</span> <span id="tmg"></span></div>
+
+<script>
+const SCRIPT_URL='https://script.google.com/macros/s/AKfycbxsKh2gB4Z-lukLyuNrUlfezFMpbnl4Eu_T4I36q-GDqmRlzaiY4STo6E7mKnLQsYeHqA/exec';
+
+const STAFF=[
+  {name:'นางธัญพร ใยดี',      pin:'1111', emoji:'👩‍⚕️'},
+  {name:'น.ส. ยุภาพร สิงคร',  pin:'1111', emoji:'👩‍⚕️'},
+  {name:'นายณรงค์กรณ์ หล้าดวงดี', pin:'1111', emoji:'👨‍⚕️'},
+  {name:'นางสาวปิยะธิดา สุรนารถ', pin:'1111', emoji:'👩‍⚕️'},
+  {name:'นางจุณธิดา โคลงฉันท์',   pin:'1111', emoji:'👩‍⚕️'},
+  {name:'น.ส. นุชราภรณ์ สุโพนอก', pin:'1111', emoji:'👩‍⚕️'},
+  {name:'นายนครินทร์ แก้วบุตรดี', pin:'1111', emoji:'👨‍⚕️'},
+];
+
+// ⚠️ PIN ด้านบนเป็นค่าตัวอย่าง — ให้เปลี่ยนก่อนใช้งานจริง
+
+const MONTHS=['มกราคม','กุมภาพันธ์','มีนาคม','เมษายน','พฤษภาคม','มิถุนายน','กรกฎาคม','สิงหาคม','กันยายน','ตุลาคม','พฤศจิกายน','ธันวาคม'];
+const DAYS=['อาทิตย์','จันทร์','อังคาร','พุธ','พฤหัสบดี','ศุกร์','เสาร์'];
+
+// store: { 'YYYY-MM-DD': { type, records:[{name,time,note,present}] } }
+let store={};
+let curDate='';
+let curType='work';
+let selIdx=-1;
+let pinBuf='';
+
+function ld(){try{const d=localStorage.getItem('cpin_v1');if(d)store=JSON.parse(d);}catch(e){}}
+function sv(){localStorage.setItem('cpin_v1',JSON.stringify(store));}
+ld();
+
+// init
+const today=new Date().toISOString().slice(0,10);
+document.getElementById('inp-date').value=today;
+curDate=today;
+loadDate();buildHist();
+
+function onDateChange(){
+  curDate=document.getElementById('inp-date').value;
+  cancelPin();loadDate();buildHist();
+}
+
+function loadDate(){
+  const s=store[curDate];
+  curType=s?s.type:'work';
+  updTypeBtn();buildStaffGrid();buildSummary();
+}
+
+function setType(t){curType=t;updTypeBtn();}
+function updTypeBtn(){
+  document.getElementById('btn-work').className='dtype-btn'+(curType==='work'?' aw':'');
+  document.getElementById('btn-hol').className='dtype-btn'+(curType==='holiday'?' ah':'');
+}
+
+function getRecords(){return(store[curDate]?.records)||[];}
+
+function buildStaffGrid(){
+  const grid=document.getElementById('staff-grid');grid.innerHTML='';
+  const recs=getRecords();
+  STAFF.forEach((s,i)=>{
+    const rec=recs.find(r=>r.name===s.name);
+    const isDone=!!rec;
+    const div=document.createElement('div');
+    div.className='staff-card'+(isDone?' done':'');
+    if(!isDone)div.onclick=()=>selectStaff(i);
+    div.innerHTML=`
+      <div class="staff-avatar">${s.emoji}</div>
+      <div style="flex:1;">
+        <div class="staff-name">${s.name}</div>
+        <div class="staff-status ${isDone?'in':'out'}">${isDone?'✓ เข้างาน':'ยังไม่ได้ลงชื่อ'}</div>
+      </div>
+      ${isDone?`<button style="padding:4px 12px;border-radius:20px;border:1px solid #fca5a5;background:#fff;color:#dc2626;font-size:11px;font-family:inherit;cursor:pointer;font-weight:500;white-space:nowrap;" onclick="event.stopPropagation();cancelRecord('${s.name}')">ยกเลิก</button>`:''}`;
+    grid.appendChild(div);
+  });
+}
+
+function cancelRecord(name){
+  if(!store[curDate])return;
+  store[curDate].records=(store[curDate].records||[]).filter(r=>r.name!==name);
+  sv();buildStaffGrid();buildSummary();buildHist();
+  showToast('↩️','ยกเลิกการลงชื่อของ '+name+' แล้ว');
+}
+
+function selectStaff(i){
+  const recs=getRecords();
+  const rec=recs.find(r=>r.name===STAFF[i].name);
+  if(rec){showToast('ℹ️',STAFF[i].name+' ลงชื่อแล้ว');return;}
+  selIdx=i;pinBuf='';
+  document.getElementById('pin-name').textContent=STAFF[i].name;
+  document.getElementById('pin-avatar').textContent=STAFF[i].emoji;
+  document.getElementById('pin-sub').textContent='กรอก PIN 4 หลักของคุณ';
+  document.getElementById('pin-note').value='';
+  document.getElementById('pin-err').classList.remove('show');
+  document.getElementById('pin-panel').classList.add('open');
+  document.getElementById('pin-panel').scrollIntoView({behavior:'smooth'});
+  updPinDisplay();buildKeypad();
+
+  // highlight selected
+  document.querySelectorAll('.staff-card').forEach((c,j)=>{
+    c.classList.toggle('selected',j===i);
+  });
+}
+
+function cancelPin(){
+  selIdx=-1;pinBuf='';
+  document.getElementById('pin-panel').classList.remove('open');
+  document.querySelectorAll('.staff-card').forEach(c=>c.classList.remove('selected'));
+}
+
+function buildKeypad(){
+  const kp=document.getElementById('pin-keypad');kp.innerHTML='';
+  [1,2,3,4,5,6,7,8,9,'',0,'⌫'].forEach(k=>{
+    const btn=document.createElement('button');
+    btn.className='pin-key'+(k==='⌫'?' del':'')+(k===''?' invisible':'');
+    btn.style.visibility=k===''?'hidden':'visible';
+    btn.textContent=k;
+    if(k!=='')btn.onclick=()=>pressKey(k);
+    kp.appendChild(btn);
+  });
+}
+
+function pressKey(k){
+  if(k==='⌫'){pinBuf=pinBuf.slice(0,-1);}
+  else if(pinBuf.length<4){pinBuf+=k;}
+  updPinDisplay();
+  document.getElementById('pin-err').classList.remove('show');
+  if(pinBuf.length===4)setTimeout(checkPin,200);
+}
+
+function updPinDisplay(){
+  const disp=document.getElementById('pin-display');disp.innerHTML='';
+  for(let i=0;i<4;i++){
+    const dot=document.createElement('div');
+    dot.className='pin-dot'+(i<pinBuf.length?' filled':'');
+    disp.appendChild(dot);
+  }
+}
+
+async function checkPin(){
+  if(selIdx<0)return;
+  const staff=STAFF[selIdx];
+  if(pinBuf!==staff.pin){
+    document.getElementById('pin-err').classList.add('show');
+    pinBuf='';updPinDisplay();return;
+  }
+  // PIN correct!
+  const now=new Date();
+  
+  const note=document.getElementById('pin-note').value.trim();
+
+  if(!store[curDate])store[curDate]={type:curType,records:[]};
+  store[curDate].type=curType;
+  store[curDate].records.push({name:staff.name,note,present:true});
+  sv();cancelPin();buildStaffGrid();buildSummary();buildHist();
+
+  // send to Sheets
+  showLov(true);
+  const d=new Date(curDate+'T00:00:00');
+  const dateStr=`${d.getDate()} ${MONTHS[d.getMonth()]} ${d.getFullYear()+543}`;
+  try{
+    await fetch(SCRIPT_URL,{method:'POST',body:JSON.stringify({
+      type:'signin',date:dateStr,dayType:curType,
+      rows:[{name:staff.name,present:true,note:note}]
+    }),mode:'no-cors'});
+    setSyncStatus('ok','✅ บันทึกแล้ว');
+    showToast('✓',staff.name+' ลงชื่อเรียบร้อย');
+  }catch(e){
+    setSyncStatus('err','❌ offline');
+    showToast('⚠️','บันทึกในเครื่องแล้ว แต่ส่ง Sheets ไม่ได้');
+  }
+  showLov(false);
+}
+
+function cancelRecord(name){
+  if(!store[curDate])return;
+  const recs=store[curDate].records||[];
+  store[curDate].records=recs.filter(r=>r.name!==name);
+  sv();buildStaffGrid();buildSummary();buildHist();
+  showToast('↩️','ยกเลิกการลงชื่อของ '+name+' แล้ว');
+}
+
+function buildSummary(){
+  const recs=getRecords();
+  const card=document.getElementById('summary-card');
+  const list=document.getElementById('summary-list');
+  if(!recs.length){card.style.display='none';return;}
+  card.style.display='block';
+  const d=new Date(curDate+'T00:00:00');
+  const dateStr=`วัน${DAYS[d.getDay()]}ที่ ${d.getDate()} ${MONTHS[d.getMonth()]} ${d.getFullYear()+543}`;
+  const isH=curType==='holiday';
+  list.innerHTML=`<div style="font-size:12px;color:var(--mu);margin-bottom:8px;">${dateStr} · ${isH?'วันหยุด 08:00–20:00':'วันปกติ 17:30–21:00'}</div>`+
+  STAFF.map(s=>{
+    const rec=recs.find(r=>r.name===s.name);
+    return`<div class="sum-row">
+      <div><div class="sum-name">${s.name}</div>${rec&&rec.note?`<div class="sum-time">${rec.note}</div>`:''}
+      </div>
+      <div style="text-align:right;">
+        <span class="sum-badge ${rec?'sum-in':'sum-out'}">${rec?'✓ เข้างาน':'—'}</span>
+        
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function buildHist(){
+  const keys=Object.keys(store).sort((a,b)=>b.localeCompare(a));
+  const card=document.getElementById('hist-card');const list=document.getElementById('hist-list');
+  if(!keys.length){card.style.display='none';return;}
+  card.style.display='block';
+  list.innerHTML=keys.map(k=>{
+    const s=store[k];const d=new Date(k+'T00:00:00');
+    const lbl=`${d.getDate()}/${d.getMonth()+1}/${d.getFullYear()+543}`;
+    const cnt=(s.records||[]).length;
+    const isH=s.type==='holiday';const isA=k===curDate;
+    return`<button class="hbtn${isA?' act':''}${isH&&!isA?' hol':''}" onclick="jumpTo('${k}')">${lbl}${isH?' 🔶':''} (${cnt})</button>`;
+  }).join('');
+}
+
+function jumpTo(date){
+  document.getElementById('inp-date').value=date;
+  curDate=date;cancelPin();loadDate();
+}
+
+function setSyncStatus(t,m){const el=document.getElementById('sync');el.className='sync '+(t==='ok'?'ok':'err');el.textContent=m;}
+function showLov(on){document.getElementById('lov').className='lov'+(on?' on':'');}
+function showToast(icon,msg){
+  document.getElementById('tic').textContent=icon;document.getElementById('tmg').textContent=msg;
+  const t=document.getElementById('toast');t.classList.add('show');
+  clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove('show'),3000);
+}
+function openModal(){
+  const keys=Object.keys(store).sort();
+  document.getElementById('pdf-from').value=keys[0]||curDate;
+  document.getElementById('pdf-to').value=keys[keys.length-1]||curDate;
+  document.getElementById('mbg').classList.add('open');
+}
+function closeMod(){document.getElementById('mbg').classList.remove('open');}
+document.getElementById('mbg').onclick=e=>{if(e.target===document.getElementById('mbg'))closeMod();};
+
+function exportPDF(all){
+  let dates;
+  if(all){dates=Object.keys(store).sort();}
+  else{
+    const from=document.getElementById('pdf-from').value;
+    const to=document.getElementById('pdf-to').value;
+    dates=Object.keys(store).filter(k=>(!from||k>=from)&&(!to||k<=to)).sort();
+  }
+  const th=all?'':document.getElementById('pdf-th').value;
+  if(!dates.length){showToast('⚠️','ไม่มีข้อมูลในช่วงที่เลือก');return;}
+
+  let rows='';let no=1;
+  dates.forEach(dk=>{
+    const s=store[dk];if(!s)return;
+    const d=new Date(dk+'T00:00:00');
+    const ds=`${DAYS[d.getDay()]}ที่ ${d.getDate()} ${MONTHS[d.getMonth()]} ${d.getFullYear()+543}`;
+    const isH=s.type==='holiday';
+    const typeLabel=isH?'วันหยุด/นักขัตฤกษ์':'วันปกติ';
+    const timeLabel=isH?'08:00–20:00':'17:30–21:00';
+    const rowBg=isH?'#fff7ed':'#fff';
+
+    STAFF.forEach((staff,i)=>{
+      if(th&&staff.name!==th)return;
+      const rec=(s.records||[]).find(r=>r.name===staff.name);
+      const present=rec?'✓':'';
+      
+      const note=rec?rec.note||'':'—';
+      const pStyle=rec?'color:#0d6e4f;font-size:12pt;font-weight:700;':'';
+      const top=i===0?'border-top:1.5px solid #b5c4bc;':'';
+      rows+=`<tr style="background:${rowBg};">
+        <td style="text-align:center;${top}">${i===0?no++:''}</td>
+        <td style="${top}">${i===0?ds:''}</td>
+        <td style="${top}color:${isH?'#c2410c':'#0d6e4f'};font-size:9pt;">${i===0?typeLabel:''}</td>
+        <td style="${top}font-size:9pt;">${i===0?timeLabel:''}</td>
+        <td style="font-weight:500;">${staff.name}</td>
+        <td style="text-align:center;${pStyle}">${present}</td>
+        
+        <td style="font-size:9pt;color:#555;">${note}</td>
+      </tr>`;
+    });
+  });
+
+  const from=document.getElementById('pdf-from').value;
+  const to=document.getElementById('pdf-to').value;
+  const d1=from?new Date(from+'T00:00:00'):null;
+  const d2=to?new Date(to+'T00:00:00'):null;
+  const fmt=d=>`${d.getDate()} ${MONTHS[d.getMonth()]} ${d.getFullYear()+543}`;
+  const subtitle=all?'บันทึกทั้งหมด':`${d1?fmt(d1):'—'} ถึง ${d2?fmt(d2):'—'}`+(th?` · ${th}`:'');
+
+  const html=`<!DOCTYPE html><html lang="th"><head><meta charset="UTF-8">
+<link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+@page{size:A4 landscape;margin:10mm 8mm;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Sarabun',Arial,sans-serif;font-size:10pt;}
+table{width:100%;border-collapse:collapse;table-layout:fixed;}
+td,th{border:.35px solid #c0cbc6;padding:4px 6px;vertical-align:middle;overflow:hidden;}
+.ht{font-size:13pt;font-weight:600;color:#0d6e4f;background:#e6f4ef;border:none;padding:7px 10px;}
+.hs{font-size:9pt;color:#6b7c74;background:#e6f4ef;border:none;padding:1px 10px 7px;}
+.thr th{background:#f0f4f2;font-weight:600;font-size:8.5pt;color:#555;padding:5px 6px;}
+tr{page-break-inside:avoid;}
+</style></head><body>
+<table>
+<tr><td colspan="7" class="ht">ธัญพรคลินิก — บันทึกการปฏิบัติงาน</td></tr>
+<tr><td colspan="7" class="hs">${subtitle}</td></tr>
+<tr><td colspan="7" style="height:4px;border:none;"></td></tr>
+<tr class="thr">
+  <th style="width:26px;text-align:center;">ที่</th>
+  <th style="width:118px;">วันที่</th>
+  <th style="width:105px;">ประเภทวัน</th>
+  <th style="width:85px;">เวลา</th>
+  <th style="width:155px;">ชื่อ-นามสกุล</th>
+  <th style="width:52px;text-align:center;">เข้างาน</th>
+  
+  <th>หมายเหตุ</th>
+</tr>
+${rows}
+</table>
+<script>window.onload=()=>setTimeout(()=>window.print(),600);<\/script>
+</body></html>`;
+
+  const win=window.open('','_blank','width=1150,height=780');
+  if(!win){showToast('⚠️','กรุณาอนุญาต Popup');return;}
+  win.document.write(html);win.document.close();
+  closeMod();showToast('📄','เปิดหน้า PDF...');
+}
+</script>
+</body>
+</html>
